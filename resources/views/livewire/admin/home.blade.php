@@ -1,7 +1,5 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="py-4">
+<div>
+    <div class="py-4">
     <div class="dropdown">
         <button class="btn btn-gray-800 d-inline-flex align-items-center me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -648,4 +646,4 @@
         </div>
     </div>
 </div>
-@endsection
+</div>
