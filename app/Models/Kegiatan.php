@@ -25,4 +25,9 @@ class Kegiatan extends Model
     {
         return $this->hasMany(Subprogram::class);
     }
+
+    public function subkegiatans()
+    {
+        return $this->hasMany(Subkegiatan::class);
+    }
 }

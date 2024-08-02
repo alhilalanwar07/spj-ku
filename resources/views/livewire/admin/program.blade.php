@@ -119,6 +119,7 @@
                             <span class="text-muted">Belum ada sub program.</span>
                             @endforelse
                         </span>
+                    </td>
                     <td class="text-end">
                         <a href="# " class="btn btn-info btn-sm btn-rounded" wire:click.prevent="edit({{ $program->id }}) " data-bs-toggle="modal" data-bs-target="#modaEdit">Lihat</a>
                         <a href="#" wire:click.prevent="hapus({{ $program->id }})" class="btn btn-danger btn-sm btn-rounded">Delete</a>
@@ -227,14 +228,11 @@
                                             @endif
                                         </td>
                                     </tr>
-
-
                                     @empty
                                     <tr>
                                         <td colspan="4" class="text-center">Belum ada sub program</td>
                                     </tr>
                                     @endforelse
-
                                 </tbody>
                             </table>
                         </div>

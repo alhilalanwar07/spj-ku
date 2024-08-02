@@ -37,7 +37,7 @@
                     title: data[0]['title']
                     , text: data[0]['text']
                     , icon: data[0]['type']
-                    , timer: data[0]['timeout']
+                    , timer: data[0]['timeout'] 
                     , timerProgressBar: true
                 , });
                 setTimeout(function() { window.location.reload(); }, data[0]['timeout']);
