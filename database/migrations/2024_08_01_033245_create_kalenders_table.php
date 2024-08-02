@@ -16,7 +16,8 @@ return new class extends Migration
             $table->integer('tahun');
             $table->integer('bulan');
             $table->date('tanggal_libur');
-            $table->text('katerangan_libur')->nullable();
+            $table->text('keterangan_libur')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

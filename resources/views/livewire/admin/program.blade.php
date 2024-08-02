@@ -12,10 +12,10 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Manajemen User</li>
+                    <li class="breadcrumb-item active" aria-current="page">Program</li>
                 </ol>
             </nav>
-            <h2 class="h4">Manajemen User</h2>
+            <h2 class="h4">Program</h2>
             <p class="mb-0"></p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -81,70 +81,72 @@
             <thead>
                 <tr>
                     <th class="border-gray-200" style="width: 5%">#</th>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Email</th>
-                    <th class="border-gray-200">Role</th>
+                    <th class="border-gray-200">Program</th>
+                    <th class="border-gray-200">Sub Program</th>
                     <th class="border-gray-200" style="width: 10%">Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $user)
+                @foreach ($programs as $program)
                 <tr>
                     <td>
                         <a href="#" class="fw-bold">
-                            {{ ($loop->index) + (($users->currentPage() - 1) * $users->perPage()) + 1 }}
+                            {{ ($loop->index) + (($programs->currentPage() - 1) * $programs->perPage()) + 1 }}
                         </a>
                     </td>
                     <td>
-                        <span class="fw-normal">{{ $user->name }}</span>
+                        <span class="fw-normal text-wrap fw-bold">
+
+                            <span class="badge bg-primary">
+                                {{ $program->kode_rekening_program }}
+                            </span>
+                            <br> {{ $program->nama_program }}
+                            @if($program->istilah_program != null)
+                            ({{ $program->istilah_program }})
+                            @endif
+                        </span>
                     </td>
-                    <td><span class="fw-normal">{{ $user->email }}</span></td>
-                    <td><span class="fw-normal text-uppercase">{{ $user->role }}</span></td>
+                    <td>
+                        <span class="fw-normal">
+                            @forelse($program->subPrograms as $subProgram)
+                            <span class="fw-bold">
+                                [{{ $subProgram->kode_rekening_subprogram }}]
+                            </span>{{ $subProgram->nama_subprogram }}
+                            @if(!$loop->last)
+                            <br>
+                            @endif
+                            @empty
+                            <span class="text-muted">Belum ada sub program.</span>
+                            @endforelse
+                        </span>
                     <td class="text-end">
-                        <a href="# " class="btn btn-info btn-sm btn-rounded" wire:click.prevent="edit({{ $user->id }}) " data-bs-toggle="modal" data-bs-target="#modaEdit">Edit</a>
-                        <a href="#" wire:click.prevent="hapus({{ $user->id }})" class="btn btn-danger btn-sm btn-rounded">Delete</a>
+                        <a href="# " class="btn btn-info btn-sm btn-rounded" wire:click.prevent="edit({{ $program->id }}) " data-bs-toggle="modal" data-bs-target="#modaEdit">Lihat</a>
+                        <a href="#" wire:click.prevent="hapus({{ $program->id }})" class="btn btn-danger btn-sm btn-rounded">Delete</a>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        <div class="mt-2">{{ $users->links() }}</div>
+        <div class="mt-2">{{ $programs->links() }}</div>
     </div>
     <!-- Modal Content -->
     <div wire:ignore.self class="modal fade" id="modaTambah" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content ">
                 <div class="modal-header">
-                    <h2 class="h6 modal-title">Tambah User</h2>
+                    <h2 class="h6 modal-title">Tambah Program</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form>
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" wire:model="name">
+                            <label class="form-label">Kode Rekening Program</label>
+                            <input type="text" class="form-control @error('kode_rekening_program') is-invalid @enderror" wire:model="kode_rekening_program">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email">
-                            @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" wire:model="password">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
-                                <option value="">-- Pilih Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="bpp">BPP</option>
-                                <option value="pptk">PPTK</option>
-                                <option value="kabag">KABAG</option>
-                            </select>
+                            <label class="form-label">Nama Program</label>
+                            <textarea class="form-control @error('nama_program') is-invalid @enderror" wire:model="nama_program" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -156,41 +158,98 @@
         </div>
     </div>
     <div wire:ignore.self class="modal fade" id="modaEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg " role="document">
             <div class="modal-content ">
                 <div class="modal-header">
-                    <h2 class="h6 modal-title">Update User</h2>
+                    <h2 class="h6 modal-title">Update Program dan Sub Program</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form>
                     @csrf
-                    <div class="modal-body">
-                        <div class="form-group mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" wire:model="name">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email">
-                            @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" wire:model="password" autocomplete="new-password">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
-                                <option value="">-- Pilih Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="bpp">BPP</option>
-                                <option value="pptk">PPTK</option>
-                                <option value="kabag">KABAG</option>
-                            </select>
+                    <div class="modal-body border-bottom">
+                        <div class="table-responsive">
+                            <table class="table table-lg table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Sub Program</th>
+                                        <th>Istilah Program</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                    $subprograms = $subprograms ?? \App\Models\Subprogram::where('program_id', $program_id)->get();
+                                    @endphp
+                                    @if(!$isTambahSub)
+                                    <tr>
+                                        <td colspan="4">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" wire:click.prevent="tambahSub"><i class="fa fa-plus"></i> Tambah Sub Program</button>
+                                        </td>
+                                    </tr>
+
+                                    @else
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control" wire:model="kode_rekening_subprogram_baru">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" wire:model="nama_subprogram_baru">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-success" wire:click.prevent="simpanSub"><i class="fa fa-check"></i> Simpan</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" wire:click.prevent="batalTambahSub"><i class="fa fa-times"></i> Batal</button>
+                                        </td>
+                                    </tr>
+                                    @endif
+                                    @forelse($subprograms as $subprogram)
+                                    <tr>
+                                        <td>
+                                            @if($isEditing && $subprogram->id == $subprogram_id)
+                                            <input type="text" class="form-control" wire:model="kode_rekening_subprogram.{{ $subprogram->id }}" value="{{ $subprogram->kode_rekening_subprogram }}" autofocus>
+                                            @else
+                                            {{ $subprogram->kode_rekening_subprogram }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isEditing && $subprogram->id == $subprogram_id)
+                                            <input type="text" class="form-control" wire:model="nama_subprogram.{{ $subprogram->id }}" value="{{ $subprogram->nama_subprogram }}" autofocus>
+                                            @else
+                                            {{ $subprogram->nama_subprogram }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isEditing && $subprogram->id == $subprogram_id)
+                                            <button type="button" class="btn btn-sm btn-outline-success" wire:click.prevent="updateSub({{ $subprogram->id }})"><i class="fa fa-check"></i> Update</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" wire:click.prevent="cancelEdit"><i class="fa fa-times"></i> Cancel</button>
+                                            @else
+                                            <button type="button" class="btn btn-sm btn-outline-success" wire:click.prevent="editSub({{ $subprogram->id }})"><i class="fa fa-pencil"></i> Edit</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" wire:click.prevent="hapusSub({{ $subprogram->id }})"><i class="fa fa-trash"></i> Hapus</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+
+
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">Belum ada sub program</td>
+                                    </tr>
+                                    @endforelse
+
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Kode Rekening Program</label>
+                            <input type="text" class="form-control @error('kode_rekening_program') is-invalid @enderror" wire:model="kode_rekening_program">
+                        </div>
+                        <div class="form-group mb-1">
+                            <label class="form-label">Nama Program</label>
+                            <textarea class="form-control @error('nama_program') is-invalid @enderror" wire:model="nama_program" rows="3"></textarea>
+                        </div>
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-info" wire:click="update()" @if($modal) data-bs-dismiss="modal" @endif>Update</button>
                         <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">Close</button>

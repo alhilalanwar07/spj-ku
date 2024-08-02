@@ -15,7 +15,9 @@ class ManajemenUser extends Component
     public $search = '';
     public $perpage = 10;
     public $selectedPerPage = 10;
-    public $name, $email, $password, $role;
+    public $name, $email, $password, $role, $user_id;
+
+    public $modal = true;
 
     public function updatedSearch()
     {
@@ -32,6 +34,7 @@ class ManajemenUser extends Component
         $this->perpage = $value;
         $this->resetPage();
     }
+
     public function render()
     {
         $users = User::where('name', 'like', '%'.$this->search.'%')->paginate($this->perpage);
@@ -47,6 +50,8 @@ class ManajemenUser extends Component
         $this->email = null;
         $this->password = null;
         $this->role = null;
+
+        $this->modal = false;
     }
 
     public function simpan()
@@ -68,24 +73,73 @@ class ManajemenUser extends Component
         ]);
 
         // jika berhasil di tambah
-        $this->dispatch('tambah', [
+        $this->dispatch('tambahAlert', [
             'title'     => 'Simpan data berhasil',
             'text'      => 'Data User Berhasil Ditambahkan',
             'type'      => 'success',
             'timeout'   => 1000
         ]);
 
-        $this->dispatch('closeModal');
-
         $this->resetInput();
 
     }
+
+    public function edit($id)
+    {
+        $user = User::find($id);
+
+        $this->user_id = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->role = $user->role;
+
+        $this->password = '';
+
+        $this->modal = true;
+    }
+
+    public function update()
+    {
+        $this->validate([
+            'name' => 'required',
+            'email' => 'required | unique:users,email,'.$this->user_id,
+            'role' => 'required',
+        ],[
+            'email.unique' => 'Email sudah terdaftar'
+        ]);
+
+        $user = User::find($this->user_id);
+
+        $user->update([
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role
+        ]);
+
+        if($this->password != ''){
+            $user->update([
+                'password' => bcrypt($this->password),
+            ]);
+        }
+
+        $this->dispatch('updateAlert', [
+            'title'     => 'Update data berhasil',
+            'text'      => 'Data User Berhasil Diupdate',
+            'type'      => 'success',
+            'timeout'   => 1000
+        ]);
+
+        $this->modal = false;
+
+        $this->resetInput();
+    }
+
 
     public function hapus($id)
     {
         User::find($id)->delete();
 
-        $this->dispatch('hapus', [
+        $this->dispatch('hapusAlert', [
             'title'     => 'Hapus data berhasil',
             'text'      => 'Data User Berhasil Dihapus',
             'type'      => 'success',

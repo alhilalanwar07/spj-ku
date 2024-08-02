@@ -1,0 +1,66 @@
+/* Tambahkan gaya CSS sesuai kebutuhan Anda */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.event {
+    background-color: #f2f2f2;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+/* Gaya untuk bulan sebelumnya */
+td.prev-month {
+    color: #aaa;
+}
+/* Gaya untuk bulan setelahnya */
+td.next-month {
+    color: #aaa; /* Warna abu-abu */
+    /* opacity: 0.7; Transparansi rendah */
+}
+
+/* Gaya untuk tanggal hari ini */
+td.today {
+    /* border-radius: 50%; */
+    background-color: #8aff8a;
+}
+
+td:hover {
+    cursor: pointer;
+    background-color: #e6e6e6;
+}
+
+/* Gaya untuk hari libur */
+td.holiday {
+    background-color: red;
+    color: white /* Warna merah untuk hari libur */
+}
+
+td.lepas-piket {
+    background-color: rgb(28, 119, 255);
+    color: white /* Warna merah untuk hari libur */
+}
+
+td.prev-month.disabled {
+    color: #ccc; /* Warna abu-abu untuk menunjukkan bahwa tidak dapat diklik */
+    cursor: not-allowed;
+}
+
+/* Gaya untuk bulan setelahnya yang tidak dapat diklik */
+td.next-month.disabled {
+    color: #ccc; /* Warna abu-abu untuk menunjukkan bahwa tidak dapat diklik */
+    cursor: not-allowed;
+}
+
+.modal-fullscreen {
+    min-height: 100%;
+    min-width: 100%;
+    margin: 0;
+  }

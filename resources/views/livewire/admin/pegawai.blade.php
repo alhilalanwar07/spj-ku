@@ -12,10 +12,10 @@
                         </a>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Admin</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Manajemen User</li>
+                    <li class="breadcrumb-item active" aria-current="page">Pegawai</li>
                 </ol>
             </nav>
-            <h2 class="h4">Manajemen User</h2>
+            <h2 class="h4">Pegawai</h2>
             <p class="mb-0"></p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -81,74 +81,86 @@
             <thead>
                 <tr>
                     <th class="border-gray-200" style="width: 5%">#</th>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Email</th>
-                    <th class="border-gray-200">Role</th>
+                    <th class="border-gray-200">Nama / NIP</th>
+                    <th class="border-gray-200">Jabatan</th>
+                    <th class="border-gray-200">Golongan</th>
+                    {{-- <th class="border-gray-200">Pangkat</th> --}}
                     <th class="border-gray-200" style="width: 10%">Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $user)
+                @foreach ($pegawais as $pegawai)
                 <tr>
                     <td>
                         <a href="#" class="fw-bold">
-                            {{ ($loop->index) + (($users->currentPage() - 1) * $users->perPage()) + 1 }}
+                            {{ ($loop->index) + (($pegawais->currentPage() - 1) * $pegawais->perPage()) + 1 }}
                         </a>
                     </td>
                     <td>
-                        <span class="fw-normal">{{ $user->name }}</span>
+                        <span class="fw-normal">{{ $pegawai->nama }} <br>
+                            {{-- NIP --}}
+                            <span class="text-muted">NIP.{{ $pegawai->nip }}</span>
+                        </span>
                     </td>
-                    <td><span class="fw-normal">{{ $user->email }}</span></td>
-                    <td><span class="fw-normal text-uppercase">{{ $user->role }}</span></td>
+                    <td><span class="fw-normal">{{ $pegawai->jabatan }}</span></td>
+                    <td><span class="fw-normal text-uppercase">{{ $pegawai->golongan }}</span></td>
                     <td class="text-end">
-                        <a href="# " class="btn btn-info btn-sm btn-rounded" wire:click.prevent="edit({{ $user->id }}) " data-bs-toggle="modal" data-bs-target="#modaEdit">Edit</a>
-                        <a href="#" wire:click.prevent="hapus({{ $user->id }})" class="btn btn-danger btn-sm btn-rounded">Delete</a>
+                        <a href="# " class="btn btn-info btn-sm btn-rounded" wire:click.prevent="edit({{ $pegawai->id }}) " data-bs-toggle="modal" data-bs-target="#modaEdit">Edit</a>
+                        <a href="#" wire:click.prevent="hapus({{ $pegawai->id }})" class="btn btn-danger btn-sm btn-rounded">Delete</a>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        <div class="mt-2">{{ $users->links() }}</div>
+        <div class="mt-2">{{ $pegawais->links() }}</div>
     </div>
     <!-- Modal Content -->
     <div wire:ignore.self class="modal fade" id="modaTambah" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content ">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="h6 modal-title">Tambah User</h2>
+                    <h2 class="h6 modal-title">Tambah Pegawai</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form>
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" wire:model="name">
+                            <label class="form-label">Nama</label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" wire:model="nama" placeholder="Ex. John Doe">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">NIP</label>
+                            <input type="text" class="form-control @error('nip') is-invalid @enderror" wire:model="nip" placeholder="Ex. 123456789">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Jabatan</label>
+                            <input type="text" class="form-control @error('jabatan') is-invalid @enderror" wire:model="jabatan" placeholder="Ex. Kepala Bagian ">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Golongan</label>
+                            <input type="text" class="form-control @error('golongan') is-invalid @enderror" wire:model="golongan" placeholder="Ex. III/d">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email">
-                            @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email" placeholder="Ex. johndoe@example.com">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" wire:model="password">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" wire:model="password" placeholder="Ex. *********">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label">Role</label>
                             <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
-                                <option value="">-- Pilih Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="bpp">BPP</option>
                                 <option value="pptk">PPTK</option>
+                                <option value="bpp">BPP</option>
                                 <option value="kabag">KABAG</option>
+                                <option value="pegawai">Pegawai</option>
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" wire:click="simpan()" @if($modal) data-bs-dismiss="modal" @endif>Simpan</button>
+                        <button type="button" class="btn btn-primary" wire:click="simpan()" @if($modal) data-bs-dismiss="modal" @endif >Simpan</button>
                         <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -157,42 +169,34 @@
     </div>
     <div wire:ignore.self class="modal fade" id="modaEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content ">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="h6 modal-title">Update User</h2>
+                    <h2 class="h6 modal-title">Update Pegawai</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form>
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" wire:model="name">
+                            <label class="form-label">Nama</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" wire:model="nama">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email">
-                            @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <label class="form-label">NIP</label>
+                            <input type="text" class="form-control @error('nip') is-invalid @enderror" wire:model="nip">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" wire:model="password" autocomplete="new-password">
+                            <label class="form-label">Jabatan</label>
+                            <input type="text" class="form-control @error('jabatan') is-invalid @enderror" wire:model="jabatan">
                         </div>
                         <div class="form-group mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-select @error('role') is-invalid @enderror" wire:model="role">
-                                <option value="">-- Pilih Role --</option>
-                                <option value="admin">Admin</option>
-                                <option value="bpp">BPP</option>
-                                <option value="pptk">PPTK</option>
-                                <option value="kabag">KABAG</option>
-                            </select>
+                            <label class="form-label">Golongan</label>
+                            <input type="text" class="form-control @error('golongan') is-invalid @enderror" wire:model="golongan">
                         </div>
+
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-info" wire:click="update()" @if($modal) data-bs-dismiss="modal" @endif>Update</button>
+                        <button type="button" class="btn btn-info" wire:click="update()" @if($modal) data-bs-dismiss="modal" @endif >Update</button>
                         <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
