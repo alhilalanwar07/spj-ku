@@ -172,8 +172,8 @@
                             <table class="table table-lg table-borderless table-hover">
                                 <thead>
                                     <tr>
+                                        <th>Kode Rek. Sub Program</th>
                                         <th>Nama Sub Program</th>
-                                        <th>Istilah Program</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>

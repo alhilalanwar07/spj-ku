@@ -15,7 +15,6 @@ class Subkegiatan extends Model
         'kode_rekening_subkegiatan',
         'nama_subkegiatan',
         'anggaran',
-        'kegiatan_id',
     ];
 
     public function kegiatan()
