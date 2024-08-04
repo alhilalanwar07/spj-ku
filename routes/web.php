@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\{Route, Auth};
 // disable register, reset password
 Auth::routes(['register' => false, 'reset' => false]);
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Auth::routes();
 
@@ -27,3 +27,6 @@ Route::get('/profil', App\Livewire\Profil::class)->name('profil');
     Route::get('/admin/subkegiatan', App\Livewire\Admin\Subkegiatan::class)->name('admin.subkegiatan');
     Route::get('/admin/aktivitas', App\Livewire\Admin\Aktivitas::class)->name('admin.aktivitas');
     Route::get('/admin/kalender', App\Livewire\Admin\Kalender::class)->name('admin.kalender');
+
+    //user dashboard
+    Route::get('/', App\Livewire\User\Dashboard::class)->name('user.dashboard');

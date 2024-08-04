@@ -24,7 +24,7 @@ class Subkegiatan extends Model
 
     public function aktivitas()
     {
-        return $this->hasMany(AktivitasPegawai::class);
+        return $this->hasMany(Aktivitas::class);
     }
 
 

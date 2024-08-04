@@ -17,6 +17,7 @@ class Aktivitas extends Model
         'penyelenggara',
         'keterangan',
         'subkegiatan_id',
+        'nominal',
     ];
 
     public function subkegiatan()
@@ -24,9 +25,9 @@ class Aktivitas extends Model
         return $this->belongsTo(Subkegiatan::class);
     }
 
-    public function pegawai()
+    public function aktivitasPegawais()
     {
-        return $this->belongsToMany(Pegawai::class);
+        return $this->hasMany(AktivitasPegawai::class, 'aktivitas_id');
     }
 
 }

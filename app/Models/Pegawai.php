@@ -24,7 +24,9 @@ class Pegawai extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function aktivitas(){
-        return $this->hasMany(Aktivitas::class);
+
+    public function aktivitasPegawais()
+    {
+        return $this->hasMany(AktivitasPegawai::class, 'pegawai_id');
     }
 }

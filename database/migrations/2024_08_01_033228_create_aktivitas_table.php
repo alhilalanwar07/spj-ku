@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             // range tanggal, keterangan, tempat
             $table->date('tanggal_mulai');
-            $table->date('tanggal_selesai');
-            $table->string('tempat');
-            $table->string('penyelenggara');
-            $table->text('keterangan');
+            $table->date('tanggal_selesai')->default(function () {
+                return $this->tanggal_mulai;
+            });
+            $table->string('tempat')->nullable();
+            $table->string('penyelenggara')->nullable();
+            $table->text('keterangan')->nullable();
 
             $table->foreignId('subkegiatan_id')->constrained('subkegiatans')->onDelete('cascade');
             $table->softDeletes();

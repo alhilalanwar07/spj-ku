@@ -154,7 +154,7 @@ class Kegiatan extends Component
     {
         $cekSubkegiatan = \App\Models\Subkegiatan::where('kegiatan_id', $id)->count();
         if ($cekSubkegiatan > 0) {
-            $this->dispatch('updateAlert', [
+            $this->dispatch('updateAlertToast', [
                 'title'     => 'Hapus data gagal',
                 'text'      => 'Data Kegiatan Tidak Bisa Dihapus Karena Memiliki Sub Kegiatan',
                 'type'      => 'error',
