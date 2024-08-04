@@ -29,4 +29,17 @@ class Pegawai extends Model
     {
         return $this->hasMany(AktivitasPegawai::class, 'pegawai_id');
     }
+
+
+    public function dinasLuars()
+    {
+        return $this->hasMany(Dinasluar::class, 'pegawai_id');
+    }
+
+    public function kalenders()
+    {
+        return $this->hasMany(Kalender::class, 'pegawai_id');
+    }
+
+
 }

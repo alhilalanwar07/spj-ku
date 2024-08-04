@@ -30,4 +30,9 @@ class Aktivitas extends Model
         return $this->hasMany(AktivitasPegawai::class, 'aktivitas_id');
     }
 
+    public function dinasLuars()
+    {
+        return $this->hasMany(Dinasluar::class, 'aktivitas_id');
+    }
+
 }

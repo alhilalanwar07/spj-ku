@@ -2,9 +2,10 @@
 
 namespace App\Livewire\User;
 
-use App\Models\Kalender as Kalenderkerja;
 use Carbon\Carbon;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
+use App\Models\Kalender as Kalenderkerja;
 
 class Dashboard extends Component
 {
@@ -27,7 +28,7 @@ class Dashboard extends Component
 
     public $subkegiatans;
     public $pegawais;
-    public $isPerjalananDinas = false;
+    public $isPerjalananDinas = 0;
 
     public $selectedSubkegiatan;
     // public $isPerjalananDinas = false;
@@ -41,20 +42,32 @@ class Dashboard extends Component
     public $subkegiatan;
     public $pegawai;
 
-    protected $rules = [
-        'selectedSubkegiatan' => 'required',
-        'tempat' => 'required|string|max:255',
-        'penyelenggara' => 'required|string|max:255',
-        'keterangan' => 'nullable|string',
-        'nominal' => 'required|numeric|min:0',
-        'tanggal_mulai' => 'required|date',
-        'tanggal_selesai' => 'required_if:isPerjalananDinas,true|date|after_or_equal:tanggal_mulai',
-        'selectedPegawai' => 'required_if:isPerjalananDinas,true|array|min:1',
-    ];
+    public $viewStateAktif;
+
+    protected function rules() {
+        $rules = [
+            'selectedSubkegiatan' => 'required',
+            'tempat' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:255',
+            'keterangan' => 'nullable|string',
+            'nominal' => 'required|numeric|min:0',
+            'tanggal_mulai' => 'required|date',
+        ];
+
+        if ($this->subViewState === 'view1') {
+            $rules['tanggal_selesai'] = 'required|date|after_or_equal:tanggal_mulai';
+            $rules['selectedPegawai.*'] = 'exists:pegawai,id';
+        }
+
+        return $rules;
+    }
 
     // public $newActivity;
     public $activities = [];
 
+    public $viewState = '';
+
+    public $subViewState = '';
 
     public function mount()
     {
@@ -74,11 +87,44 @@ class Dashboard extends Component
         $this->pegawais = \App\Models\Pegawai::orderBy('nama', 'asc')->get();
         $this->subkegiatans = \App\Models\Subkegiatan::orderBy('kode_rekening_subkegiatan', 'asc')->get();
 
+
+    }
+
+
+    public function changeView($view)
+    {
+        $this->viewState = $view;
+    }
+
+    public function changeSubView($view)
+    {
+        $this->subViewState = $view;
+
+        // kosongkan tanggal mulai dan selesai
+        $this->tanggal_mulai = null;
+        $this->tanggal_selesai = null;
     }
 
     public function simpanAktivitas()
     {
+        // dd($this->subViewState);
+        // dd($this->selectedPegawai);
         $this->validate();
+
+        // cek anggaran sebelum menyimpan aktivitas
+        $subkegiatan = \App\Models\Subkegiatan::findOrFail($this->selectedSubkegiatan);
+        $anggaran = $subkegiatan->anggaran;
+        $anggaran = $anggaran - $this->nominal;
+        if ($anggaran < 0) {
+            $this->dispatch('updateAlertToast', [
+                'title' => 'Gagal menyimpan aktivitas',
+                'text' => 'Anggaran tidak mencukupi',
+                'type' => 'error',
+                'timeout' => 2000,
+            ]);
+
+            return;
+        }
 
         DB::transaction(function () {
             $aktivitas = \App\Models\Aktivitas::create([
@@ -88,16 +134,30 @@ class Dashboard extends Component
                 'keterangan' => $this->keterangan,
                 'nominal' => $this->nominal,
                 'tanggal_mulai' => $this->tanggal_mulai,
-                'tanggal_selesai' => $this->isPerjalananDinas ? $this->tanggal_selesai : null,
-                'is_perjalanan_dinas' => $this->isPerjalananDinas,
+                'tanggal_selesai' => $this->isPerjalananDinas ? $this->tanggal_selesai : null
             ]);
 
-            if ($this->isPerjalananDinas) {
+            // dapatkan semua tanggal
+
+            if ($this->isPerjalananDinas == 1) {
                 foreach ($this->selectedPegawai as $pegawaiId) {
                     \App\Models\AktivitasPegawai::create([
                         'aktivitas_id' => $aktivitas->id,
                         'pegawai_id' => $pegawaiId,
                     ]);
+
+                    // simpan ke tabel dinasluar
+
+                    for($date = Carbon::parse($this->tanggal_mulai); $date->lte(Carbon::parse($this->tanggal_selesai)); $date->addDay()) {
+                        \App\Models\Dinasluar::create([
+                            'aktivitas_id' => $aktivitas->id,
+                            'pegawai_id' => $pegawaiId,
+                            'tanggal' => $date->format('Y-m-d'),
+                            'bulan' => $date->format('m'),
+                            'tahun' => $date->format('Y'),
+                            'catatan' => 'DL',
+                        ]);
+                    }
                 }
             }
         });
@@ -110,19 +170,21 @@ class Dashboard extends Component
         ]);
 
         // Optionally, reset form fields
-        $this->reset([
-            'selectedSubkegiatan',
-            'isPerjalananDinas',
-            'tempat',
-            'penyelenggara',
-            'keterangan',
-            'nominal',
-            'tanggal_mulai',
-            'tanggal_selesai',
-            'selectedPegawai',
-        ]);
+        $this->resetInputAktivitas();
+    }
 
 
+    public function resetInputAktivitas()
+    {
+        $this->selectedSubkegiatan = '';
+        // $this->isPerjalananDinas = '';
+        $this->tempat = '';
+        $this->penyelenggara = '';
+        $this->keterangan = '';
+        $this->nominal = '';
+        $this->tanggal_mulai = '';
+        $this->tanggal_selesai = '';
+        $this->selectedPegawai = [];
     }
 
     public function updatedIsPerjalananDinas($value)
@@ -133,7 +195,13 @@ class Dashboard extends Component
             $this->selectedPegawai = [];
         }
 
-        $this->isPerjalananDinas = $value;
+        if($value) {
+            $this->isPerjalananDinas = 1;
+            $this->viewStateAktif = 'view1';
+        } else {
+            $this->isPerjalananDinas = 0;
+            $this->viewStateAktif = 'view2';
+        }
     }
 
     public function loadHolidays()
@@ -208,8 +276,7 @@ class Dashboard extends Component
     public function getAktivitasBulanan($month, $year)
     {
         // Query to get monthly activities based on the selected month and year
-        return \App\Models\Aktivitas::with('kegiatan.subprogram.program', 'kegiatan.subkegiatan')
-            ->whereMonth('tanggal_mulai', $month)
+        return \App\Models\Aktivitas::whereMonth('tanggal_mulai', $month)
             ->whereYear('tanggal_mulai', $year)
             ->get();
     }

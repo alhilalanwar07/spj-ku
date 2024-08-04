@@ -15,5 +15,11 @@ class Kalender extends Model
         'bulan',
         'tanggal_libur',
         'katerangan_libur',
+        'pegawai_id',
     ];
+
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class);
+    }
 }
