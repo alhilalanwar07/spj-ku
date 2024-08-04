@@ -293,6 +293,8 @@
                                 <th>Tempat / Tanggal</th>
                                 <th>Penyelenggara / Keterangan</th>
                                 <th>Anggaran</th>
+                                <th>Konfirmasi</th>
+                                <th>Action </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -302,15 +304,15 @@
                             @forelse ($listAktivitasBulanan as $aktivitas)
                             <tr class="text-left" style="align: left !important;">
                                 <td>{{ $loop->iteration }}</td>
-                                <td class="text-left" style="text-align: left !important">
+                                <td class="text-left text-wrap" style="text-align: left !important">
                                     [{{ $aktivitas->subkegiatan->kegiatan->subprogram->program->kode_rekening_program }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->nama_program }}<br>
                                     &nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kegiatan->subprogram->kode_rekening_subprogram }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->nama_subprogram }}<br>
                                     &nbsp;&nbsp;&nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kegiatan->kode_rekening_kegiatan }}] {{ $aktivitas->subkegiatan->kegiatan->nama_kegiatan }}<br>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kode_rekening_subkegiatan }}] {{ $aktivitas->subkegiatan->nama_subkegiatan }}
                                 </td>
                                 <td>
-                                <span class="badge bg-info mb-1 text-uppercase">{{ $aktivitas->tempat }}</span>
-                                     <br>
+                                    <span class="badge bg-info mb-1 text-uppercase">{{ $aktivitas->tempat }}</span>
+                                    <br>
                                     {{ date('d-m-Y', strtotime($aktivitas->tanggal_mulai)) }} <br> s/d <br>
                                     {{ date('d-m-Y', strtotime($aktivitas->tanggal_selesai)) }}
                                 </td>
@@ -319,6 +321,30 @@
                                     Ket.: {{ $aktivitas->keterangan }}
                                 </td>
                                 <td>Rp. {{ number_format($aktivitas->nominal, 0, ',', '.') }}</td>
+                                <td>
+                                    <span class="d-flex justify-content-between align-items-center form-control badge bg-{{ $aktivitas->acc_pptk == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_pptk == 'belum' ? 'Menunggu konfirmasi' : 'Sudah dikonfirmasi' }}">
+                                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            @if($aktivitas->acc_pptk == 'sudah') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @else
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @endif
+                                        </svg> PPTK
+                                    </span>
+                                    <span class="mt-1 form-control badge bg-{{ $aktivitas->acc_kabag == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_kabag == 'belum' ? 'Menunggu konfirmasi ' : 'Sudah dikonfirmasi' }}">
+                                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            @if($aktivitas->acc_kabag == 'sudah') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @else
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @endif
+                                        </svg> KABAG
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (auth()->user()->role == 'kabag' || auth()->user()->role == 'pptk')
+                                    {{-- button konfirmasi --}}
+                                    <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                    @endif
+                                </td>
                             </tr>
                             @empty
                             <tr>
@@ -338,7 +364,40 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header " id="headingProgram{{ $program->id }}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProgram{{ $program->id }}" aria-expanded="false" aria-controls="collapseProgram{{ $program->id }}">
-                            {{ '[ ' . $program->kode_rekening_program . ' ] '  . $program->nama_program . '' }}
+                            <div class="d-flex justify-content-between w-100">
+                                <span>
+                                    {{ '[ ' . $program->kode_rekening_program . ' ] '  . $program->nama_program . '' }}
+                                </span>
+                                <span class="d-flex align-items-center">
+                                    <span class="badge bg-info">
+                                        &nbsp;Anggaran: Rp. {{ number_format($program->subPrograms->sum(function($subprogram) {
+                                return $subprogram->kegiatans->sum(function($kegiatan) {
+                                    return $kegiatan->subkegiatans->sum('anggaran');
+                                });
+                            }), 0, ',', '.') }}
+                                    </span>
+                                    &nbsp;
+                                    <span class="badge bg-success">
+                                        &nbsp;Realisasi: Rp. {{ number_format($program->subPrograms->sum(function($subprogram) {
+                                return $subprogram->kegiatans->sum(function($kegiatan) {
+                                    return $kegiatan->subkegiatans->sum(function($subkegiatan) {
+                                        return $subkegiatan->aktivitas->sum('nominal');
+                                    });
+                                });
+                            }), 0, ',', '.') }}
+                                    </span>
+                                    &nbsp;
+                                    <span class="badge bg-danger">
+                                        &nbsp;Sisa: Rp. {{ number_format($program->subPrograms->sum(function($subprogram) {
+                                return $subprogram->kegiatans->sum(function($kegiatan) {
+                                    return $kegiatan->subkegiatans->sum('anggaran') - $kegiatan->subkegiatans->sum(function($subkegiatan) {
+                                        return $subkegiatan->aktivitas->sum('nominal');
+                                    });
+                                });
+                            }), 0, ',', '.') }}
+                                    </span>
+                                </span>
+                            </div>
                         </button>
                     </h2>
                     <div id="collapseProgram{{ $program->id }}" class="accordion-collapse collapse" aria-labelledby="headingProgram{{ $program->id }}" data-bs-parent="#accordionExample">
@@ -348,7 +407,34 @@
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingSubProgram{{ $subprogram->id }}">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSubProgram{{ $subprogram->id }}" aria-expanded="false" aria-controls="collapseSubProgram{{ $subprogram->id }}">
-                                            {{ '[ ' . $subprogram->kode_rekening_subprogram . ' ] ' . '' . $subprogram->nama_subprogram . ' ' }}
+                                            <div class="d-flex justify-content-between w-100">
+                                                <span>
+                                                    {{ '[ ' . $subprogram->kode_rekening_subprogram . ' ] ' . '' . $subprogram->nama_subprogram . ' ' }}
+                                                </span>
+                                                <span class="d-flex align-items-center">
+                                                    <span class="badge bg-info">
+                                                        &nbsp;Anggaran: Rp. {{ number_format($subprogram->kegiatans->sum(function($kegiatan) {
+                                                return $kegiatan->subkegiatans->sum('anggaran');
+                                            }), 0, ',', '.') }}
+                                                    </span>
+                                                    &nbsp;
+                                                    <span class="badge bg-success">
+                                                        &nbsp;Realisasi: Rp. {{ number_format($subprogram->kegiatans->sum(function($kegiatan) {
+                                                return $kegiatan->subkegiatans->sum(function($subkegiatan) {
+                                                    return $subkegiatan->aktivitas->sum('nominal');
+                                                });
+                                            }), 0, ',', '.') }}
+                                                    </span>
+                                                    &nbsp;
+                                                    <span class="badge bg-danger">
+                                                        &nbsp;Sisa: Rp. {{ number_format($subprogram->kegiatans->sum(function($kegiatan) {
+                                                return $kegiatan->subkegiatans->sum('anggaran') - $kegiatan->subkegiatans->sum(function($subkegiatan) {
+                                                    return $subkegiatan->aktivitas->sum('nominal');
+                                                });
+                                            }), 0, ',', '.') }}
+                                                    </span>
+                                                </span>
+                                            </div>
                                         </button>
                                     </h2>
                                     <div id="collapseSubProgram{{ $subprogram->id }}" class="accordion-collapse collapse" aria-labelledby="headingSubProgram{{ $subprogram->id }}" data-bs-parent="#accordionSubProgram{{ $subprogram->id }}">
@@ -359,7 +445,31 @@
                                                     <h2 class="accordion-header" id="headingKegiatan{{ $kegiatan->id }}">
 
                                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKegiatan{{ $kegiatan->id }}" aria-expanded="false" aria-controls="collapseKegiatan{{ $kegiatan->id }}">
-                                                            {{ '[ ' . $kegiatan->kode_rekening_kegiatan . ' ] ' . $kegiatan->nama_kegiatan . '' }}
+                                                            <div class="d-flex justify-content-between w-100">
+                                                                <span class="d-flex align-items-start">
+                                                                    <span style="margin-right: 5px;">
+                                                                        [{{ $kegiatan->kode_rekening_kegiatan }}]
+                                                                    </span>
+                                                                    <span title="{{ $kegiatan->nama_kegiatan }}">{{ Str::limit($kegiatan->nama_kegiatan, 72) }}</span>
+                                                                </span>
+                                                                <span class="d-flex align-items-center">
+                                                                    <span class="badge bg-info">
+                                                                        &nbsp;Anggaran: Rp. {{ number_format($kegiatan->subkegiatans->sum('anggaran'), 0, ',', '.') }}
+                                                                    </span>
+                                                                    &nbsp;
+                                                                    <span class="badge bg-success">
+                                                                        &nbsp;Realisasi: Rp. {{ number_format($kegiatan->subkegiatans->sum(function ($subkegiatan) {
+                                                                return $subkegiatan->aktivitas->sum('nominal');
+                                                            }), 0, ',', '.') }}
+                                                                    </span>
+                                                                    &nbsp;
+                                                                    <span class="badge bg-danger">
+                                                                        &nbsp;Sisa: Rp. {{ number_format($kegiatan->subkegiatans->sum('anggaran') - $kegiatan->subkegiatans->sum(function ($subkegiatan) {
+                                                                return $subkegiatan->aktivitas->sum('nominal');
+                                                            }), 0, ',', '.') }}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
                                                         </button>
                                                     </h2>
                                                     <div id="collapseKegiatan{{ $kegiatan->id }}" class="accordion-collapse collapse" aria-labelledby="headingKegiatan{{ $kegiatan->id }}" data-bs-parent="#accordionKegiatan{{ $kegiatan->id }}">
@@ -394,7 +504,30 @@
                                                                     </h2>
                                                                     <div id="collapseSubKegiatan{{ $subkegiatan->id }}" class="accordion-collapse collapse" aria-labelledby="headingSubKegiatan{{ $subkegiatan->id }}" data-bs-parent="#accordionSubKegiatan{{ $subkegiatan->id }}">
                                                                         <div class="accordion-body">
-
+                                                                            <!-- Konten aktivitas atau informasi tambahan lainnya -->
+                                                                            <table class="table">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Tahun</th>
+                                                                                        <th>Bulan</th>
+                                                                                        <th>Nominal</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach ($subkegiatan->aktivitas->groupBy(['tanggal_mulai']) as $aktivitas)
+                                                                                        @php
+                                                                                            // localize id
+                                                                                            setlocale(LC_TIME, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'Indonesia');
+                                                                                            $date = Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai);
+                                                                                        @endphp
+                                                                                        <tr>
+                                                                                            <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->format('Y') }}</td>
+                                                                                            <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->translatedFormat('F') }}</td>
+                                                                                            <td>Rp. {{ number_format($aktivitas->sum('nominal'), 0, ',', '.') }}</td>
+                                                                                        </tr>
+                                                                                    @endforeach
+                                                                                </tbody>
+                                                                            </table>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -414,6 +547,8 @@
                     </div>
                 </div>
                 @endforeach
+
+
             </div>
         </div>
 
@@ -427,6 +562,7 @@
                 @this.set('selectedSubkegiatan', data);
             });
         });
+
     </script>
 
     @endpush

@@ -18,6 +18,8 @@ class Aktivitas extends Model
         'keterangan',
         'subkegiatan_id',
         'nominal',
+        'acc_pptk',
+        'acc_kabag',
     ];
 
     public function subkegiatan()
