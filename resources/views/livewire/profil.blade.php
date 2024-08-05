@@ -27,7 +27,7 @@
                     <div class="card shadow border-0 text-center p-0">
                         <div class="profile-cover rounded-top" data-background="{{ url('/') }}/assets/img/profile-cover.jpg"></div>
                         <div class="card-body pb-5">
-                            <img src="{{ url('/') }}/assets/img/team/profile-picture-1.jpg" class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" alt="Neil Portrait">
+                            <img src="{{ url('/') }}/assets/img/favicon/android-chrome-192x192.png" class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" alt="Neil Portrait">
                             <h4 class="h3 text-uppercase">{{ Auth::check() ? Auth::user()->name : '' }}</h4>
                             <h5 class="fw-normal">{{ Auth::check() ? Auth::user()->email : '' }}</h5>
                             <p class="text-gray mb-3 text-uppercase fw-bold "><span class="badge bg-primary ">{{ Auth::check() ? Auth::user()->role : '' }}</span> </p>

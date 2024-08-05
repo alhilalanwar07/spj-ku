@@ -36,11 +36,14 @@ class Aktivitas extends Component
     }
     public function render()
     {
+        $aktivitas = \App\Models\Aktivitas::where('penyelenggara', 'like', '%'.$this->search.'%')
+                    ->orWhere('tempat', 'like', '%'.$this->search.'%')
+                    ->orWhere('keterangan', 'like', '%'.$this->search.'%')
+                    ->orderBy('id', 'asc')
+                    ->paginate($this->perpage);
+
         return view('livewire.admin.aktivitas',[
-            'aktivitas' => \App\Models\Aktivitas::where('penyelenggara', 'like', '%'.$this->search.'%')
-                            ->orWhere('tempat', 'like', '%'.$this->search.'%')
-                            ->orWhere('keterangan', 'like', '%'.$this->search.'%')
-                            ->paginate($this->perpage)
+            'aktivitass' => $aktivitas
         ])->layout('components.layouts.app', ['title' => 'Data Aktivitas']);
     }
 }

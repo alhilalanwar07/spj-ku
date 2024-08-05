@@ -23,7 +23,6 @@
     </div>
 
     <div class="card card-body border-0 shadow table-wrapper table-responsive">
-
         <table class="table">
             <div class="d-flex justify-content-between align-items-center border-bottom">
                 <button class="btn btn-primary btn-sm mb-2" wire:click="previousMonth">&lt;</button>
@@ -58,37 +57,57 @@
                     @endforeach
                 </tr>
                 @endforeach
-
             </tbody>
         </table>
 
-        <div class="my-3">
-            <span>Keterangan :</span>
-            @foreach($listHariLibur as $holiday)
-            <div class="my-2">
-                <span class="text-danger">{{ date('d-m-Y', strtotime($holiday->tanggal_libur))}}</span> : {{$holiday->keterangan_libur}}
-            </div>
-            @endforeach
-        </div>
-        <div wire:ignore.self class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambahLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalTambahLabel">Masukkan Event Untuk Tanggal Ini</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-">
-                            <label for="">Keterangan Hari Libur</label>
-                            <input type="text" class="form-control @error('keterangan') is-invalid @enderror" wire:model="keterangan" placeholder="Masukkan Keterangan Hari Libur">
+        <div class="row">
+            <div class="col-4 col-md-4">
+                <div class="my-3">
+                    <span class="h3 badge bg-primary">Keterangan :</span> <br>
+                    @foreach($listHariLibur as $holiday)
+                    <small class="my-2">
+                        <span class="text-danger">{{ date('d-m-Y', strtotime($holiday->tanggal_libur))}}</span> : {{$holiday->keterangan_libur}}
+                    </small>
+                    <br>
+                    @endforeach
+                </div>
+                <div wire:ignore.self class="modal fade" id="modalTambah" tabindex="-1" role="dialog" aria-labelledby="modalTambahLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalTambahLabel">Masukkan Event Untuk Tanggal Ini</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-">
+                                    <label for="">Keterangan Hari Libur</label>
+                                    <input type="text" class="form-control @error('keterangan') is-invalid @enderror" wire:model="keterangan" placeholder="Masukkan Keterangan Hari Libur">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="button" class="btn btn-primary" wire:click="simpanHariLibur">Simpan</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary" wire:click="simpanHariLibur">Simpan</button>
+                </div>
+            </div>
+            <div class="col-8 col-md-8">
+                <div class="my-3">
+                    <span class="h3 badge bg-primary">Dinas Luar :</span>
+                    <div class="row">
+                        @foreach($listDinasLuar as $dinasLuar)
+                    <div class="col-6">
+                        <span class="text-danger">{{ date('d-m-Y', strtotime($dinasLuar->tanggal)) }}</span> :
+                        {{
+                            $dinasLuar->pegawai ? $dinasLuar->pegawai->nama : 'Pegawai tidak ditemukan'
+                        }}
                     </div>
+                    @endforeach
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -123,6 +142,7 @@
                 });
             });
         });
+
     </script>
     @endpush
     @livewire('alert')

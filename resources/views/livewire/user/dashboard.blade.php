@@ -91,8 +91,9 @@
 
     </style>
     @endsection
-    <div class="card card-body border-0 shadow table-wrapper table-responsive mt-4">
-        <table class="table">
+    <div class="card card-body border-0 shadow  mt-4 table-responsive ">
+        {{-- <div class="table-responsive table-wrapper"> --}}
+        <table class="table ">
             <div class="d-flex justify-content-between align-items-center border-bottom">
                 <button class="btn btn-primary btn-sm mb-2" wire:click="previousMonth">&lt;</button>
                 <span class="h5 badge bg-primary">{{ $monthName }} {{ $year }}</span>
@@ -115,13 +116,17 @@
                     $isPrevMonth = $day['isPrevMonth'];
                     $isCurrentMonth = !$isNextMonth && !$isPrevMonth;
                     $holidayDescription = $isHoliday ? $day['holidayDescription'] : '';
+
+                    // Format tanggal untuk cek dinas luar
+                    $dayDate = Carbon\Carbon::parse("$year-$month-{$day['day']}")->format('Y-m-d');
+
+                    // Cek apakah ada tanggal dinas luar pada hari ini
+                    $user = \App\Models\Pegawai::where('user_id', auth()->user()->id)->first();
+                    $dinasLuarUser = $user ? \App\Models\Dinasluar::where('pegawai_id', $user->id)->where('tanggal', $dayDate)->first() : null;
                     @endphp
-                    <td class="{{ $isPrevMonth ? 'prev-month' : '' }}  {{ isset($day['today']) ? 'today' : '' }} {{ $isHoliday ? 'holiday' : '' }} {{ $isNextMonth ? 'next-month' : '' }}">
-                        <div title="{{ $holidayDescription }}">
-                            <span>{{ $day['day'] }}</span>
-                            @foreach($day['events'] as $event)
-                            <div class="event">{{ $event }}</div>
-                            @endforeach
+                    <td class="{{ $isPrevMonth ? 'prev-month' : '' }} {{ isset($day['today']) ? 'today' : '' }} {{ $isHoliday ? 'holiday' : '' }} {{ $isNextMonth ? 'next-month' : '' }} {{ $dinasLuarUser ? 'bg-info' : '' }}" >
+                        <div title="{{ ($holidayDescription ? $holidayDescription : '') }} {{ $dinasLuarUser ? 'Dinas Luar' : '' }} " >
+                            <span class="{{ $dinasLuarUser ? 'text-white' : '' }}">{{ $day['day'] }}</span>
                         </div>
                     </td>
                     @endforeach
@@ -130,7 +135,7 @@
 
             </tbody>
         </table>
-
+        {{-- </div> --}}
         <div class="my-3">
 
             @php
@@ -160,7 +165,7 @@
                         Close
                     </button>
                     @else
-                        <span class="badge bg-info mb-2">Total Realisasi : Rp. {{ number_format($listAktivitasBulanan->sum('nominal'), 0, ',', '.') }}</span>
+                    <span class="badge bg-info mb-2">Total Realisasi : Rp. {{ number_format($listAktivitasBulanan->sum('nominal'), 0, ',', '.') }}</span>
                     @endif
                 </div>
 
@@ -298,7 +303,7 @@
                                 <th>Penyelenggara / Keterangan</th>
                                 <th>Anggaran</th>
                                 <th>Konfirmasi</th>
-                                 @if(Auth::check() && Auth::user()->role !== 'bpp')
+                                @if(Auth::check() && Auth::user()->role !== 'bpp')
                                 <th>Action </th>
                                 @endif
                             </tr>
@@ -320,7 +325,8 @@
                                     <span class="badge bg-info mb-1 text-uppercase">{{ $aktivitas->tempat }}</span>
                                     <br>
                                     {{ date('d-m-Y', strtotime($aktivitas->tanggal_mulai)) }} <br> s/d <br>
-                                    {{ date('d-m-Y', strtotime($aktivitas->tanggal_selesai)) }}
+                                    {{ date('d-m-Y', strtotime($aktivitas->tanggal_selesai ?? $aktivitas->tanggal_mulai)) }}
+
                                 </td>
                                 <td style="text-align: left !important" class="text-wrap">
                                     <span class=" badge bg-info mb-1 text-uppercase">{{ $aktivitas->penyelenggara }}</span> <br>
@@ -345,27 +351,27 @@
                                         </svg> KABAG
                                     </span>
                                 </td>
-                                 @if(Auth::check() && Auth::user()->role !== 'bpp')
+                                @if(Auth::check() && Auth::user()->role !== 'bpp')
                                 <td>
                                     @if (Auth::check())
-                                        @if(auth()->user()->role == 'kabag')
-                                        {{-- button konfirmasi --}}
-                                            @if($aktivitas->acc_kabag !== 'Dikonfirmasi')
-                                            <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
-                                            @else
-                                                <span class="badge bg-success">Dikonfirmasi</span>
-                                            @endif
-                                        @elseif(auth()->user()->role == 'pptk')
-                                            {{-- button konfirmasi --}}
-                                            @if($aktivitas->acc_pptk !== 'Dikonfirmasi')
-                                            <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
-                                            @else
-                                                <span class="badge bg-success">Dikonfirmasi</span>
-                                            @endif
-                                        @endif
+                                    @if(auth()->user()->role == 'kabag')
+                                    {{-- button konfirmasi --}}
+                                    @if($aktivitas->acc_kabag !== 'Dikonfirmasi')
+                                    <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                    @else
+                                    <span class="badge bg-success">Dikonfirmasi</span>
+                                    @endif
+                                    @elseif(auth()->user()->role == 'pptk')
+                                    {{-- button konfirmasi --}}
+                                    @if($aktivitas->acc_pptk !== 'Dikonfirmasi')
+                                    <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                    @else
+                                    <span class="badge bg-success">Dikonfirmasi</span>
+                                    @endif
+                                    @endif
                                     @endif
                                 </td>
-                                    @endif
+                                @endif
                             </tr>
                             @empty
                             <tr>
@@ -536,16 +542,16 @@
                                                                                 </thead>
                                                                                 <tbody>
                                                                                     @foreach ($subkegiatan->aktivitas->groupBy(['tanggal_mulai']) as $aktivitas)
-                                                                                        @php
-                                                                                            // localize id
-                                                                                            setlocale(LC_TIME, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'Indonesia');
-                                                                                            $date = Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai);
-                                                                                        @endphp
-                                                                                        <tr>
-                                                                                            <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->format('Y') }}</td>
-                                                                                            <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->translatedFormat('F') }}</td>
-                                                                                            <td>Rp. {{ number_format($aktivitas->sum('nominal'), 0, ',', '.') }}</td>
-                                                                                        </tr>
+                                                                                    @php
+                                                                                    // localize id
+                                                                                    setlocale(LC_TIME, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'Indonesia');
+                                                                                    $date = Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai);
+                                                                                    @endphp
+                                                                                    <tr>
+                                                                                        <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->format('Y') }}</td>
+                                                                                        <td>{{ Carbon\Carbon::parse($aktivitas->first()->tanggal_mulai)->translatedFormat('F') }}</td>
+                                                                                        <td>Rp. {{ number_format($aktivitas->sum('nominal'), 0, ',', '.') }}</td>
+                                                                                    </tr>
                                                                                     @endforeach
                                                                                 </tbody>
                                                                             </table>

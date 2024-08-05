@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use Carbon\Carbon;
 use Livewire\Component;
+use App\Models\Dinasluar;
 use App\Models\Kalender as Kalenderkerja;
 
 class Kalender extends Component
@@ -18,6 +19,7 @@ class Kalender extends Component
     public $listHariLibur;
     public $isPrevMonth = false;
     public $isNextMonth = false;
+    public $listDinasLuar;
 
     public function mount()
     {
@@ -134,9 +136,15 @@ class Kalender extends Component
             ->orderBy('tanggal_libur','asc')
             ->get();
 
+        $this->listDinasLuar = Dinasluar::whereYear('tanggal', $this->year)
+            ->whereMonth('tanggal', $this->month)
+            ->orderBy('tanggal','asc')
+            ->get();
+
         return view('livewire.admin.kalender',[
             'monthName' => $monthName,
-            'listHariLibur' => $this->listHariLibur
+            'listHariLibur' => $this->listHariLibur,
+            'listDinasLuar' => $this->listDinasLuar
         ])->layout('components.layouts.app', ['title' => 'Kalender']);
     }
 

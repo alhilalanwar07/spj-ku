@@ -84,53 +84,75 @@
                     <th class="border-gray-200">Program/Kegiatan</th>
                     <th class="border-gray-200">Waktu & Tempat</th>
                     <th class="border-gray-200">Penyelenggara/Keterangan</th>
-                    <th class="border-gray-200">Pegawai</th>
-                    <th class="border-gray-200" style="width: 10%">Action</th>
+                    <th class="border-gray-200">Nominal</th>
+                    <th class="border-gray-200">Konfirmasi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($aktivitas as $aktivitas)
+                @foreach ($aktivitass as $aktivitas)
                 <tr>
                     <td>
                         <a href="#" class="fw-bold">
-                            {{ ($loop->index) + (($aktivitas->currentPage() - 1) * $aktivitas->perPage()) + 1 }}
+                            {{ ($loop->index) + 1 }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" class="fw-bold text-wrap">
+                            <small class="text-info">
+                                <b>{{ $aktivitas->subkegiatan->kegiatan->kode_rekening_kegiatan }}</b> - {{ $aktivitas->subkegiatan->kegiatan->nama_kegiatan }}
+                            </small>
+                            &nbsp;&nbsp;{{ $aktivitas->subkegiatan->kode_rekening_subkegiatan }} - {{ $aktivitas->subkegiatan->nama_subkegiatan }}<br>
+                            {{-- {{ $aktivitas->subkegiatan->kegiatan->subprogram->nama_subprogram }} - {{ $aktivitas->subkegiatan->kegiatan->subprogram->kode_rekening_subprogram }} <br>
+                            {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->nama_program }} - {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->kode_rekening_program }} --}}
                         </a>
                     </td>
                     <td>
                         <a href="#" class="fw-bold">
-                            {{ $aktivitas->subkegiatan->nama_subkegiatan }} - {{ $aktivitas->subkegiatan->kode_rekening_subkegiatan }} <br>
-                            {{ $aktivitas->subkegiatan->kegiatan->nama_kegiatan }} - {{ $aktivitas->subkegiatan->kegiatan->kode_rekening_kegiatan }} <br>
-                            {{ $aktivitas->subkegiatan->kegiatan->subprogram->nama_subprogram }} - {{ $aktivitas->subkegiatan->kegiatan->subprogram->kode_rekening_subprogram }} <br>
-                            {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->nama_program }} - {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->kode_rekening_program }}
+                            <span class="badge bg-info">
+                                {{ $aktivitas->tempat }}
+                            </span> <br>
+                            {{ \Carbon\Carbon::parse($aktivitas->tanggal_mulai)->isoFormat('dddd, D MMMM Y') }} s/d <br>
+                            {{ \Carbon\Carbon::parse($aktivitas->tanggal_selesai ?? $aktivitas->tanggal_mulai)->isoFormat('dddd, D MMMM Y') }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" class="fw-bold text-wrap">
+                            <span class="badge bg-info">{{ $aktivitas->penyelenggara }}</span> <br>
+                            {{ $aktivitas->keterangan }}
                         </a>
                     </td>
                     <td>
                         <a href="#" class="fw-bold">
-                            {{ $aktivitas->tempat }} <br>
-                            @if ($aktivitas->tanggal_mulai != $aktivitas->tanggal_selesai)
-                                {{ \Carbon\Carbon::parse($aktivitas->tanggal_mulai)->isoFormat('dddd, D MMMM Y') }} s/d <br>
-                                {{ \Carbon\Carbon::parse($aktivitas->tanggal_selesai)->isoFormat('dddd, D MMMM Y') }}
-                            @else
-                                {{ \Carbon\Carbon::parse($aktivitas->tanggal_mulai)->isoFormat('dddd, D MMMM Y') }}
-                            @endif
+                            <span class="badge bg-info">
+                                Rp. {{ number_format($aktivitas->nominal, 0, ',', '.') }}
+                            </span>
                         </a>
                     </td>
                     <td>
-                        <a href="#" class="fw-bold">
-                            <span class="badge bg-secondary">{{ $aktivitas->penyelenggara }}</span>
-                            Ket: {{ $aktivitas->keterangan }}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="#" class="fw-bold">
-                            {{ $aktivitas->pegawai }}
-                        </a>
+                        <span class="d-flex justify-content-between align-items-center form-control badge bg-{{ $aktivitas->acc_pptk == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_pptk == 'belum' ? 'Menunggu konfirmasi' : 'Sudah dikonfirmasi' }}">
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                @if($aktivitas->acc_pptk == 'Dikonfirmasi') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                @else
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                @endif
+                            </svg> PPTK
+                        </span>
+                        <span class="mt-1 form-control badge bg-{{ $aktivitas->acc_kabag == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_kabag == 'belum' ? 'Menunggu konfirmasi ' : 'Sudah dikonfirmasi' }}">
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                @if($aktivitas->acc_kabag == 'Dikonfirmasi') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                @else
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                @endif
+                            </svg> KABAG
+                        </span>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        <div class="mt-2">{{ $aktivitas->links() }}</div>
+        <div class="mt-2">
+        {{ $aktivitass->links() }}
+        </div>
     </div>
     @livewire('alert')
 </div>

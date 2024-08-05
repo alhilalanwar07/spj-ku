@@ -67,7 +67,7 @@
 
     <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
         <a class="navbar-brand me-lg-5" href="/home">
-            <img class="navbar-brand-dark" src="{{ url('/') }}/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="{{ url('/') }}/assets/img/brand/dark.svg" alt="Volt logo" />
+            <img class="navbar-brand-dark" src="{{ url('/') }}/assets/img/favicon/favicon-32x32.png" alt="bpsda" /> <img class="navbar-brand-light" src="{{ url('/') }}/assets/img/favicon/favicon-32x32.png" alt="Volt logo" />
         </a>
         <div class="d-flex align-items-center">
             <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@
             <div class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
                 <div class="d-flex align-items-center">
                     <div class="avatar-lg me-4">
-                        <img src="{{ url('/') }}/assets/img/team/profile-picture-1.jpg" class="card-img-top rounded-circle border-white" alt="Bonnie Green">
+                        <img src="{{ url('/') }}/assets/img/favicon/favicon-32x32.png" class="card-img-top rounded-circle border-white" alt="Bonnie Green">
                     </div>
                     <div class="d-block">
                         <h2 class="h5 mb-3">Hi, {{ Auth::check() ? Auth::user()->name : 'Guest' }}</h2>
@@ -119,9 +119,9 @@
                 <li class="nav-item">
                     <a href="{{ url('/') }}/home" class="nav-link d-flex align-items-center">
                         <span class="sidebar-icon">
-                            <img src="{{ url('/') }}/assets/img/brand/light.svg" height="20" width="20" alt="Volt Logo">
+                            <img src="{{ url('/') }}/assets/img/favicon/favicon-32x32.png" height="20" width="20" alt="Volt Logo">
                         </span>
-                        <span class="mt-1 ms-1 sidebar-text">Volt Overview</span>
+                        <span class="mt-1 ms-1 sidebar-text">BPSDA KOLAKA</span>
                     </a>
                 </li>
                 <li class="nav-item  @if(Request::segment(1) == 'home') active @endif ">
@@ -244,7 +244,7 @@
                         <li class="nav-item dropdown ms-lg-3">
                             <a class="nav-link dropdown-toggle pt-1 px-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="media d-flex align-items-center">
-                                    <img class="avatar rounded-circle" alt="Image placeholder" src="{{ url('/') }}/assets/img/team/profile-picture-1.jpg">
+                                    <img class="avatar rounded-circle" alt="Image placeholder" src="{{ url('/') }}/assets/img/favicon/favicon-32x32.png">
                                     <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
                                         <span class="mb-0 font-small fw-bold text-gray-900">{{ Auth::check() ? Auth::user()->name : '' }}</span>
                                     </div>

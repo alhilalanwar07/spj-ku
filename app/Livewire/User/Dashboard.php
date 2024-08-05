@@ -45,6 +45,8 @@ class Dashboard extends Component
 
     public $viewStateAktif;
 
+    public $dinasLuar;
+
     protected function rules() {
         $rules = [
             'selectedSubkegiatan' => 'required',
@@ -253,6 +255,7 @@ class Dashboard extends Component
                     'isPrevMonth' => $currentDay->month != $firstDayOfMonth->month,
                     'isNextMonth' => $currentDay->month != $firstDayOfMonth->month,
                     'holidayDescription' => Kalenderkerja::where('tanggal_libur', $currentDay->format('Y-m-d'))->value('keterangan_libur'),
+                    'dinasLuar' => \App\Models\Dinasluar::where('tanggal', $currentDay->format('Y-m-d'))->get(),
                 ];
 
                 //Tandai bulan sebelumnya
@@ -352,6 +355,6 @@ class Dashboard extends Component
             'timeout' => 1500,
         ]);
 
-        
+
     }
 }
