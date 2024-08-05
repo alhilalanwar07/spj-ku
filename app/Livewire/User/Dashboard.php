@@ -5,6 +5,7 @@ namespace App\Livewire\User;
 use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Kalender as Kalenderkerja;
 
 class Dashboard extends Component
@@ -326,5 +327,31 @@ class Dashboard extends Component
             'monthName' => $monthName,
             'listHariLibur' => $this->listHariLibur,
         ])->layout('components.layouts.template');
+    }
+
+    public function konfirmasi($id)
+    {
+        $this->selectedAktivitasId = $id;
+
+        // if pptk, update acc_pptk
+        if(Auth::user()->role == 'pptk') {
+            $aktivitas = \App\Models\Aktivitas::find($id);
+            $aktivitas->acc_pptk = 'Dikonfirmasi';
+            $aktivitas->save();
+        }
+        if(Auth::user()->role == 'kabag') {
+            $aktivitas = \App\Models\Aktivitas::find($id);
+            $aktivitas->acc_kabag = 'Dikonfirmasi';
+            $aktivitas->save();
+        }
+
+        $this->dispatch('updateAlert', [
+            'title' => 'Berhasil',
+            'text' => 'Aktivitas konfirmasi.',
+            'type' => 'success',
+            'timeout' => 1500,
+        ]);
+
+        
     }
 }

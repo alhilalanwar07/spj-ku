@@ -152,12 +152,16 @@
             <div class="my-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="h3 badge bg-primary">Aktivitas Bulanan</span>
+                    @if(Auth::check() && Auth::user()->role == 'bpp')
                     <button class="btn btn-primary btn-sm mb-2" @click="viewState = 'view1'" x-show="viewState !== 'view1'">
                         Tambah
                     </button>
                     <button class="btn btn-danger btn-sm mb-2" @click="viewState = null" x-show="viewState === 'view1'">
                         Close
                     </button>
+                    @else
+                        <span class="badge bg-info mb-2">Total Realisasi : Rp. {{ number_format($listAktivitasBulanan->sum('nominal'), 0, ',', '.') }}</span>
+                    @endif
                 </div>
 
                 <div x-show="viewState === 'view1'" style="display: none;">
@@ -294,7 +298,9 @@
                                 <th>Penyelenggara / Keterangan</th>
                                 <th>Anggaran</th>
                                 <th>Konfirmasi</th>
+                                 @if(Auth::check() && Auth::user()->role !== 'bpp')
                                 <th>Action </th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -305,8 +311,8 @@
                             <tr class="text-left" style="align: left !important;">
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="text-left text-wrap" style="text-align: left !important">
-                                    [{{ $aktivitas->subkegiatan->kegiatan->subprogram->program->kode_rekening_program }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->nama_program }}<br>
-                                    &nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kegiatan->subprogram->kode_rekening_subprogram }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->nama_subprogram }}<br>
+                                    {{-- [{{ $aktivitas->subkegiatan->kegiatan->subprogram->program->kode_rekening_program }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->program->nama_program }}<br>
+                                    &nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kegiatan->subprogram->kode_rekening_subprogram }}] {{ $aktivitas->subkegiatan->kegiatan->subprogram->nama_subprogram }}<br> --}}
                                     &nbsp;&nbsp;&nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kegiatan->kode_rekening_kegiatan }}] {{ $aktivitas->subkegiatan->kegiatan->nama_kegiatan }}<br>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[{{ $aktivitas->subkegiatan->kode_rekening_subkegiatan }}] {{ $aktivitas->subkegiatan->nama_subkegiatan }}
                                 </td>
@@ -317,14 +323,14 @@
                                     {{ date('d-m-Y', strtotime($aktivitas->tanggal_selesai)) }}
                                 </td>
                                 <td style="text-align: left !important" class="text-wrap">
-                                    <span class="text-capitalize">{{ $aktivitas->penyelenggara }}</span> <br>
-                                    Ket.: {{ $aktivitas->keterangan }}
+                                    <span class=" badge bg-info mb-1 text-uppercase">{{ $aktivitas->penyelenggara }}</span> <br>
+                                    {{ ucfirst($aktivitas->keterangan) }}
                                 </td>
                                 <td>Rp. {{ number_format($aktivitas->nominal, 0, ',', '.') }}</td>
                                 <td>
                                     <span class="d-flex justify-content-between align-items-center form-control badge bg-{{ $aktivitas->acc_pptk == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_pptk == 'belum' ? 'Menunggu konfirmasi' : 'Sudah dikonfirmasi' }}">
                                         <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            @if($aktivitas->acc_pptk == 'sudah') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @if($aktivitas->acc_pptk == 'Dikonfirmasi') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             @else
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             @endif
@@ -332,19 +338,34 @@
                                     </span>
                                     <span class="mt-1 form-control badge bg-{{ $aktivitas->acc_kabag == 'belum' ? 'danger' : 'success' }}" title="{{ $aktivitas->acc_kabag == 'belum' ? 'Menunggu konfirmasi ' : 'Sudah dikonfirmasi' }}">
                                         <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            @if($aktivitas->acc_kabag == 'sudah') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            @if($aktivitas->acc_kabag == 'Dikonfirmasi') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             @else
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             @endif
                                         </svg> KABAG
                                     </span>
                                 </td>
+                                 @if(Auth::check() && Auth::user()->role !== 'bpp')
                                 <td>
-                                    @if (auth()->user()->role == 'kabag' || auth()->user()->role == 'pptk')
-                                    {{-- button konfirmasi --}}
-                                    <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                    @if (Auth::check())
+                                        @if(auth()->user()->role == 'kabag')
+                                        {{-- button konfirmasi --}}
+                                            @if($aktivitas->acc_kabag !== 'Dikonfirmasi')
+                                            <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                            @else
+                                                <span class="badge bg-success">Dikonfirmasi</span>
+                                            @endif
+                                        @elseif(auth()->user()->role == 'pptk')
+                                            {{-- button konfirmasi --}}
+                                            @if($aktivitas->acc_pptk !== 'Dikonfirmasi')
+                                            <button type="button" class="btn btn-primary btn-sm" wire:click="konfirmasi({{ $aktivitas->id }})">Konfirmasi</button>
+                                            @else
+                                                <span class="badge bg-success">Dikonfirmasi</span>
+                                            @endif
+                                        @endif
                                     @endif
                                 </td>
+                                    @endif
                             </tr>
                             @empty
                             <tr>

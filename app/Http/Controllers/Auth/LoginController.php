@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -36,5 +37,28 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    public function login(Request $request)
+    {
+        $inputVal = $request->all();
+
+        $this->validate($request, [
+            'email'     => 'required',
+            'password'  => 'required',
+        ]);
+
+        if(auth()->attempt(array('email' => $inputVal['email'], 'password' => $inputVal['password']))){
+
+            if (auth()->user()->role == 'admin') {
+                return redirect()->route('home');
+            } else{
+                return redirect()->route('user.dashboard');
+            }
+        }else{
+
+            return redirect()->route('login')
+                ->with('error','Email & Password tidak sesuai.');
+        }
     }
 }

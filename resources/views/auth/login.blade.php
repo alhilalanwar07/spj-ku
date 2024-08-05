@@ -72,7 +72,7 @@
                                 <h1 class="mb-0 h3">{{ config('app.name') }}</h1>
                             </div>
                             <form class="mt-4" method="POST" action="{{ route('login') }}">
-                            @csrf
+                                @csrf
                                 <!-- Form -->
                                 <div class="form-group mb-4">
                                     <label for="email">Your Email</label>
@@ -86,9 +86,9 @@
                                         <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                         @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
                                         @enderror
                                     </div>
                                 </div>
@@ -106,33 +106,30 @@
                                             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                             @error('password')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                             @enderror
                                         </div>
                                     </div>
-                                    <!-- End of Form -->
-                                    <div class="d-flex justify-content-between align-items-top mb-4">
-                                        {{-- <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="remember">
-                                            <label class="form-check-label mb-0" for="remember">
-                                                Remember me
-                                            </label>
-                                        </div> --}}
-                                        <div><a href="./forgot-password.html" class="small text-right">Lost password?</a></div>
+                                    <div class="row px-2 my-2">
+                                        @if (session('error'))
+                                        <div class="alert alert-danger text-center">
+                                            {{ session('error') }}
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-gray-800">Sign in</button>
                                 </div>
                             </form>
-                            <div class="d-flex justify-content-center align-items-center mt-4">
+                            {{-- <div class="d-flex justify-content-center align-items-center mt-4">
                                 <span class="fw-normal">
                                     Not registered?
-                                    <a href="./sign-up.html" class="fw-bold">Create account</a>
+                                    <a href="#" class="fw-bold">Create account</a>
                                 </span>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -177,7 +174,7 @@
 
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-    
+
     <!-- Volt JS -->
     <script src="{{ url('/') }}/assets/js/volt.js"></script>
 
