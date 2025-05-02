@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\{Route, Auth};
         Route::get('/admin/subkegiatan', App\Livewire\Admin\Subkegiatan::class)->name('admin.subkegiatan');
         Route::get('/admin/aktivitas', App\Livewire\Admin\Aktivitas::class)->name('admin.aktivitas');
         Route::get('/admin/kalender', App\Livewire\Admin\Kalender::class)->name('admin.kalender');
+        Route::get('/admin/laporan-kertas-kerja', App\Livewire\LaporanKertasKerja::class)->name('admin.laporan-kertas-kerja');
     });
     //user dashboard
     Route::get('/', App\Livewire\User\Dashboard::class)->name('user.dashboard')->middleware(UserMiddleware::class);

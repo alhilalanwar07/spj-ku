@@ -35,8 +35,8 @@ class Dashboard extends Component
     // public $isPerjalananDinas = false;
     public $tanggal_mulai;
     public $tanggal_selesai;
-    public $tempat;
-    public $penyelenggara;
+    public $tempat = "Kantor";
+    public $penyelenggara = "BPSDA";
     // public $keterangan;
     public $nominal;
     public $selectedPegawai = [];
@@ -89,6 +89,11 @@ class Dashboard extends Component
 
         $this->pegawais = \App\Models\Pegawai::orderBy('nama', 'asc')->get();
         $this->subkegiatans = \App\Models\Subkegiatan::orderBy('kode_rekening_subkegiatan', 'asc')->get();
+
+        // beri default untuk penyelenggara, tempat, tanggal mulai
+        $this->tempat = 'Kantor';
+        $this->penyelenggara = 'BPSDA';
+        $this->tanggal_mulai = Carbon::create(2025, 3, 24)->format('Y-m-d');
 
 
     }

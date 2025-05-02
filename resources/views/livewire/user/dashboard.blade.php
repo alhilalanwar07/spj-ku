@@ -195,7 +195,7 @@
                                     <select id="subkegiatan" wire:model="selectedSubkegiatan" class=" form-select  select2">
                                         <option value="" disabled selected>Pilih Subkegiatan</option>
                                         @foreach($subkegiatans as $sub)
-                                        <option value="{{ $sub['id'] }}">[{{ $sub['kode_rekening_subkegiatan'] }}] &nbsp;{{ $sub['nama_subkegiatan'] }}</option>
+                                        <option value="{{ $sub['id'] }}">[{{ $sub['kegiatan']['kode_rekening_kegiatan'] }}] [{{ $sub['kode_rekening_subkegiatan'] }}] &nbsp;{{ $sub['nama_subkegiatan'] }}</option>
                                         @endforeach
                                     </select>
                                     @error('selectedSubkegiatan') <span class="text-danger">{{ $message }}</span> @enderror
@@ -226,7 +226,7 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="keterangan" class="form-label">Keterangan</label>
-                                                    <textarea class="form-control" id="keterangan" wire:model.defer="keterangan"></textarea>
+                                                    <textarea class="form-control" id="keterangan" wire:model.defer="keterangan" rows="6" placeholder="Masukkan keterangan"></textarea>
                                                     @error('keterangan') <span class="text-danger">{{ $message }}</span> @enderror
                                                 </div>
                                                 <div class="col-md-12">
